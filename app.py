@@ -107,7 +107,7 @@ def rank_resumes():
         # Final score (weighted)
         final_score = (0.7 * similarity_scores[i]) + (0.3 * skill_score)
 
-        ranked.append((resume_names[i], final_score, skill_score))
+        ranked.append((resume_names[i], final_score, skill_score, matched_skills))
 
     # Sort by final score
     ranked = sorted(ranked, key=lambda x: x[1], reverse=True)
