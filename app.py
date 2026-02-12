@@ -43,10 +43,30 @@ def extract_skills_from_jd(jd_text):
     extracted = []
 
     for skill in TECH_SKILLS:
-        if skill in jd_text:
+        pattern = r'\b' + re.escape(skill) + r'\b'
+        if re.search(pattern, jd_text):
             extracted.append(skill)
 
     return extracted
+
+
+# ----------------------------------
+# Smarter Experience Extraction
+# ----------------------------------
+def extract_experience(text):
+    text = text.lower()
+
+    # Handles: 2 years, 2+ years, 3 yrs, 4 yr, etc.
+    pattern = r'(\d+)\s*\+?\s*(years|year|yrs|yr)'
+
+    matches = re.findall(pattern, text)
+
+    if not matches:
+        return None
+
+    years = [int(match[0]) for match in matches]
+
+    return max(years)
 
 
 @app.route("/")
@@ -124,7 +144,9 @@ def rank_resumes():
 
     for i, resume_text in enumerate(resumes):
 
-        # Skill Matching
+        # ----------------------------------
+        # Skill Matching (Safe Regex)
+        # ----------------------------------
         matched_skills = []
 
         for skill in required_skills:
@@ -138,21 +160,18 @@ def rank_resumes():
         )
 
         # ----------------------------------
-        # Experience Scoring
+        # Experience Scoring (Improved)
         # ----------------------------------
-        jd_exp_match = re.search(r'(\d+)\s+years', job_description.lower())
-        resume_exp_match = re.search(r'(\d+)\s+years', resume_text)
+        jd_exp = extract_experience(job_description)
+        resume_exp = extract_experience(resume_text)
 
-        if jd_exp_match and resume_exp_match:
-            jd_exp = int(jd_exp_match.group(1))
-            resume_exp = int(resume_exp_match.group(1))
-
+        if jd_exp and resume_exp:
             if resume_exp >= jd_exp:
                 exp_score = 1
             else:
                 exp_score = resume_exp / jd_exp
         else:
-            exp_score = 0.5  # default if not mentioned
+            exp_score = 0.5  # default if unclear
 
         # ----------------------------------
         # Final Weighted Score
