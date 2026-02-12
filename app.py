@@ -1,3 +1,4 @@
+import re
 import os
 import pdfplumber
 from flask import Flask, render_template, request
@@ -104,10 +105,25 @@ def rank_resumes():
         else:
             skill_score = len(matched_skills) / len(required_skills)
 
-        # Final score (weighted)
-        final_score = (0.7 * similarity_scores[i]) + (0.3 * skill_score)
+        # Experience scoring
+        jd_exp_match = re.search(r'(\d+)\s+years', job_description.lower())
+        resume_exp_match = re.search(r'(\d+)\s+years', resume_text)
 
-        ranked.append((resume_names[i], final_score, skill_score, matched_skills))
+        if jd_exp_match and resume_exp_match:
+            jd_exp = int(jd_exp_match.group(1))
+            resume_exp = int(resume_exp_match.group(1))
+
+            if resume_exp >= jd_exp:
+                exp_score = 1
+            else:
+                exp_score = resume_exp / jd_exp
+        else:
+            exp_score = 0.5  # default if not mentioned
+
+        # Final score (weighted)
+        final_score = (0.6 * similarity_scores[i]) + (0.3 * skill_score) + (0.1 * exp_score)
+
+        ranked.append((resume_names[i], final_score, skill_score, matched_skills, exp_score))
 
     # Sort by final score
     ranked = sorted(ranked, key=lambda x: x[1], reverse=True)

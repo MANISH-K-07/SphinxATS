@@ -20,16 +20,18 @@
                     <th>Resume Name</th>
                     <th>Final Score</th>
                     <th>Skill Match</th>
+                    <th>Experience Score</th>
                     <th>Matched Skills</th>
                 </tr>
             </thead>
             <tbody>
-                {% for resume, final_score, skill_score, matched_skills in ranked %}
+                {% for resume, final_score, skill_score, matched_skills, exp_score in ranked %}
                 <tr>
                     <td>{{ loop.index }}</td>
                     <td>{{ resume }}</td>
                     <td>{{ "%.4f"|format(final_score) }}</td>
                     <td>{{ "%.4f"|format(skill_score) }}</td>
+                    <td>{{ "%.2f"|format(exp_score) }}</td>
                     <td>
                         {% for skill in matched_skills %}
                             <span class="badge bg-success">{{ skill }}</span>
