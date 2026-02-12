@@ -114,6 +114,14 @@ def rank_resumes():
 
     return render_template("results.html", ranked=ranked)
 
+@app.route("/clear")
+def clear_resumes():
+    for filename in os.listdir(UPLOAD_FOLDER):
+        file_path = os.path.join(UPLOAD_FOLDER, filename)
+        if os.path.isfile(file_path):
+            os.remove(file_path)
+    return "All resumes cleared successfully! <br><br><a href='/'>Go Back</a>"
+
 
 if __name__ == "__main__":
     app.run(debug=True)
