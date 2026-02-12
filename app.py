@@ -1,20 +1,20 @@
 import re
 import os
 import pdfplumber
-from flask import Flask, render_template, request
+from functools import wraps
+from flask import Flask, render_template, request, redirect, url_for, session
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 app = Flask(__name__)
+app.secret_key = "supersecretkey"   # Required for session handling
 
 UPLOAD_FOLDER = "uploads"
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
-# Ensure upload folder exists
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
-# Store job description temporarily
 job_description = ""
 
 # ----------------------------------
@@ -36,6 +36,19 @@ TECH_SKILLS = [
 ]
 
 # ----------------------------------
+# Role Protection Decorator
+# ----------------------------------
+def role_required(role):
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            if "role" not in session or session["role"] != role:
+                return render_template("403.html"), 403
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator
+
+# ----------------------------------
 # Intelligent Skill Extraction
 # ----------------------------------
 def extract_skills_from_jd(jd_text):
@@ -43,63 +56,74 @@ def extract_skills_from_jd(jd_text):
     extracted = []
 
     for skill in TECH_SKILLS:
-        pattern = r'\b' + re.escape(skill) + r'\b'
-        if re.search(pattern, jd_text):
+        if skill in jd_text:
             extracted.append(skill)
 
     return extracted
 
-
 # ----------------------------------
-# Smarter Experience Extraction
+# Login Page
 # ----------------------------------
-def extract_experience(text):
-    text = text.lower()
-
-    # Handles: 2 years, 2+ years, 3 yrs, 4 yr, etc.
-    pattern = r'(\d+)\s*\+?\s*(years|year|yrs|yr)'
-
-    matches = re.findall(pattern, text)
-
-    if not matches:
-        return None
-
-    years = [int(match[0]) for match in matches]
-
-    return max(years)
-
-
 @app.route("/")
 def home():
-    return render_template("index.html")
+    return render_template("login.html")
 
+@app.route("/login", methods=["POST"])
+def login():
+    role = request.form.get("role")
+
+    if role in ["applicant", "hr"]:
+        session["role"] = role
+        return redirect(url_for(f"{role}_dashboard"))
+
+    return render_template("message.html", message="Invalid role selected")
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("home"))
+
+# ----------------------------------
+# Applicant Dashboard
+# ----------------------------------
+@app.route("/applicant")
+@role_required("applicant")
+def applicant_dashboard():
+    return render_template("applicant.html")
 
 @app.route("/upload", methods=["POST"])
+@role_required("applicant")
 def upload_resume():
     if "resume" not in request.files:
-        return "No file part"
+        return render_template("message.html", message="No file part")
 
     file = request.files["resume"]
 
     if file.filename == "":
-        return "No selected file"
+        return render_template("message.html", message="No selected file")
 
-    if file:
-        filepath = os.path.join(app.config["UPLOAD_FOLDER"], file.filename)
-        file.save(filepath)
-        return f"Resume uploaded successfully: {file.filename}"
+    filepath = os.path.join(app.config["UPLOAD_FOLDER"], file.filename)
+    file.save(filepath)
 
-    return "Upload failed"
+    return render_template("message.html", message="Resume uploaded successfully!")
 
+# ----------------------------------
+# HR Dashboard
+# ----------------------------------
+@app.route("/hr")
+@role_required("hr")
+def hr_dashboard():
+    return render_template("hr.html")
 
 @app.route("/submit_jd", methods=["POST"])
+@role_required("hr")
 def submit_jd():
     global job_description
     job_description = request.form["jd_text"]
-    return "Job Description Submitted Successfully!"
-
+    return render_template("message.html", message="Job Description Submitted Successfully!")
 
 @app.route("/rank")
+@role_required("hr")
 def rank_resumes():
     global job_description
 
@@ -109,10 +133,9 @@ def rank_resumes():
     resumes = []
     resume_names = []
 
-    # Extract text from resumes
     for filename in os.listdir(UPLOAD_FOLDER):
         if filename.endswith(".pdf"):
-            filepath = os.path.join(UPLOAD_FOLDER, filename)
+            filepath = os.path.join(app.config["UPLOAD_FOLDER"], filename)
             text = ""
 
             with pdfplumber.open(filepath) as pdf:
@@ -125,14 +148,8 @@ def rank_resumes():
     if not resumes:
         return render_template("message.html", message="No resumes uploaded.")
 
-    # ----------------------------------
-    # Extract Required Skills
-    # ----------------------------------
     required_skills = extract_skills_from_jd(job_description)
 
-    # ----------------------------------
-    # TF-IDF Similarity
-    # ----------------------------------
     documents = [job_description.lower()] + resumes
     vectorizer = TfidfVectorizer(stop_words="english")
     tfidf_matrix = vectorizer.fit_transform(documents)
@@ -144,9 +161,6 @@ def rank_resumes():
 
     for i, resume_text in enumerate(resumes):
 
-        # ----------------------------------
-        # Skill Matching (Safe Regex)
-        # ----------------------------------
         matched_skills = []
 
         for skill in required_skills:
@@ -159,55 +173,44 @@ def rank_resumes():
             if required_skills else 0
         )
 
-        # ----------------------------------
-        # Experience Scoring (Improved)
-        # ----------------------------------
-        jd_exp = extract_experience(job_description)
-        resume_exp = extract_experience(resume_text)
+        jd_exp_match = re.search(r'(\d+)\s+years', job_description.lower())
+        resume_exp_match = re.search(r'(\d+)\s+years', resume_text)
 
-        if jd_exp and resume_exp:
-            if resume_exp >= jd_exp:
-                exp_score = 1
-            else:
-                exp_score = resume_exp / jd_exp
+        if jd_exp_match and resume_exp_match:
+            jd_exp = int(jd_exp_match.group(1))
+            resume_exp = int(resume_exp_match.group(1))
+            exp_score = 1 if resume_exp >= jd_exp else resume_exp / jd_exp
         else:
-            exp_score = 0.5  # default if unclear
+            exp_score = 0.5
 
-        # ----------------------------------
-        # Final Weighted Score
-        # ----------------------------------
         final_score = (
             (0.6 * similarity_scores[i]) +
             (0.3 * skill_score) +
             (0.1 * exp_score)
         )
 
-        ranked.append((
-            resume_names[i],
-            round(final_score, 3),
-            round(skill_score, 3),
-            matched_skills,
-            round(exp_score, 3)
-        ))
+        ranked.append({
+            "name": resume_names[i],
+            "final_score": round(final_score, 3),
+            "skill_score": round(skill_score, 3),
+            "exp_score": round(exp_score, 3),
+            "skill_percent": int(skill_score * 100),
+            "matched_skills": matched_skills
+        })
 
-    # Sort by final score
-    ranked = sorted(ranked, key=lambda x: x[1], reverse=True)
+    ranked = sorted(ranked, key=lambda x: x["final_score"], reverse=True)
 
-    return render_template(
-        "results.html",
-        ranked=ranked,
-        required_skills=required_skills
-    )
-
+    return render_template("results.html", ranked=ranked)
 
 @app.route("/clear")
+@role_required("hr")
 def clear_resumes():
     for filename in os.listdir(UPLOAD_FOLDER):
         file_path = os.path.join(UPLOAD_FOLDER, filename)
         if os.path.isfile(file_path):
             os.remove(file_path)
-    return "All resumes cleared successfully! <br><br><a href='/'>Go Back</a>"
-
+    return render_template("message.html", message="All resumes cleared successfully!")
+    
 
 if __name__ == "__main__":
     app.run(debug=True)

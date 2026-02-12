@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HR Dashboard</title>
+    <style>
+        body { font-family: Arial; background: #eef2f7; padding: 40px; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 30px; border-radius: 8px; }
+        textarea { width: 100%; height: 150px; padding: 10px; margin-top: 10px; }
+        button { padding: 10px 15px; margin-top: 15px; border: none; cursor: pointer; }
+        .submit { background: #2980b9; color: white; }
+        .rank { background: #8e44ad; color: white; }
+        .clear { background: #c0392b; color: white; }
+        button:hover { opacity: 0.9; }
+        .actions { margin-top: 20px; }
+        .logout { margin-top: 20px; display: block; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>HR Dashboard</h2>
+
+        <h3>Post Job Description</h3>
+        <form method="POST" action="/submit_jd">
+            <textarea name="jd_text" placeholder="Paste Job Description here..." required></textarea>
+            <button class="submit" type="submit">Submit JD</button>
+        </form>
+
+        <div class="actions">
+            <form action="/rank" method="GET">
+                <button class="rank" type="submit">Generate Ranking</button>
+            </form>
+
+            <form action="/clear" method="GET">
+                <button class="clear" type="submit">Clear All Resumes</button>
+            </form>
+        </div>
+
+        <a class="logout" href="/logout">Logout</a>
+    </div>
+</body>
+</html>

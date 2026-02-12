@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SphinxATS - Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .card {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 350px;
+        }
+        select, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 15px;
+        }
+        button {
+            background: #2c3e50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #1a252f;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>SphinxATS</h2>
+        <p>Select your role</p>
+
+        <form method="POST" action="/login">
+            <select name="role" required>
+                <option value="">-- Choose Role --</option>
+                <option value="applicant">Applicant</option>
+                <option value="hr">HR</option>
+            </select>
+            <button type="submit">Continue</button>
+        </form>
+    </div>
+</body>
+</html>
