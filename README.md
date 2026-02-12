@@ -53,14 +53,13 @@ The system generates a ranked list with score breakdown and matched skills.
 3. Compute cosine similarity.
 4. Match predefined technical skills.
 5. Detect years of experience using regex.
-6. Compute final weighted score:
-
-Final Score =  
-0.6 × Similarity Score  
-+ 0.3 × Skill Match Score  
-+ 0.1 × Experience Score  
-
+6. Compute final weighted score.
 7. Display ranked results with matched skills.
+
+Final Score =
+```
+0.6 × Similarity Score  + 0.3 × Skill Match Score  + 0.1 × Experience Score  
+```
 
 ---
 
@@ -95,9 +94,6 @@ Move into project directory:
 cd SphinxATS
 ```
 
-
----
-
 ### 2️⃣ Create Virtual Environment
 
 ```
@@ -106,27 +102,19 @@ python -m venv venv
 
 Activate:
 
+```
 Windows:
-
-```
 venv\Scripts\activate
-```
 
 Mac/Linux:
-
-```
 source venv/bin/activate
 ```
-
----
 
 ### 3️⃣ Install Required Packages
 
 ```
 pip install -r requirements.txt
 ```
-
----
 
 ### 4️⃣ Run Application
 
