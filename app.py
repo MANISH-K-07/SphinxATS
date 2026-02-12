@@ -5,14 +5,6 @@ from flask import Flask, render_template, request
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
-# Predefined skill set
-SKILL_SET = [
-    "python", "java", "c++", "sql", "machine learning",
-    "data science", "django", "flask", "react",
-    "node", "javascript", "html", "css",
-    "tensorflow", "pytorch", "aws", "docker"
-]
-
 app = Flask(__name__)
 
 UPLOAD_FOLDER = "uploads"
@@ -24,6 +16,38 @@ if not os.path.exists(UPLOAD_FOLDER):
 
 # Store job description temporarily
 job_description = ""
+
+# ----------------------------------
+# Master Technical Skills Dataset
+# ----------------------------------
+TECH_SKILLS = [
+    "python", "java", "c++", "c programming", "sql",
+    "machine learning", "deep learning",
+    "data science", "data analysis",
+    "flask", "django", "react", "angular",
+    "node", "nodejs", "javascript",
+    "html", "css", "bootstrap",
+    "tensorflow", "pytorch", "keras",
+    "aws", "azure", "gcp",
+    "docker", "kubernetes",
+    "mongodb", "mysql", "postgresql",
+    "git", "linux", "pandas", "numpy",
+    "opencv", "nlp", "power bi", "tableau"
+]
+
+# ----------------------------------
+# Intelligent Skill Extraction
+# ----------------------------------
+def extract_skills_from_jd(jd_text):
+    jd_text = jd_text.lower()
+    extracted = []
+
+    for skill in TECH_SKILLS:
+        if skill in jd_text:
+            extracted.append(skill)
+
+    return extracted
+
 
 @app.route("/")
 def home():
@@ -64,7 +88,6 @@ def rank_resumes():
 
     resumes = []
     resume_names = []
-    resume_texts = []
 
     # Extract text from resumes
     for filename in os.listdir(UPLOAD_FOLDER):
@@ -82,30 +105,41 @@ def rank_resumes():
     if not resumes:
         return render_template("message.html", message="No resumes uploaded.")
 
+    # ----------------------------------
+    # Extract Required Skills
+    # ----------------------------------
+    required_skills = extract_skills_from_jd(job_description)
+
+    # ----------------------------------
     # TF-IDF Similarity
+    # ----------------------------------
     documents = [job_description.lower()] + resumes
     vectorizer = TfidfVectorizer(stop_words="english")
     tfidf_matrix = vectorizer.fit_transform(documents)
-    similarity_scores = cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:]).flatten()
+    similarity_scores = cosine_similarity(
+        tfidf_matrix[0:1], tfidf_matrix[1:]
+    ).flatten()
 
     ranked = []
 
     for i, resume_text in enumerate(resumes):
+
+        # Skill Matching
         matched_skills = []
 
-        for skill in SKILL_SET:
-            if skill in job_description.lower() and skill in resume_text:
+        for skill in required_skills:
+            pattern = r'\b' + re.escape(skill) + r'\b'
+            if re.search(pattern, resume_text):
                 matched_skills.append(skill)
 
-        # Count required skills in JD
-        required_skills = [skill for skill in SKILL_SET if skill in job_description.lower()]
+        skill_score = (
+            len(matched_skills) / len(required_skills)
+            if required_skills else 0
+        )
 
-        if len(required_skills) == 0:
-            skill_score = 0
-        else:
-            skill_score = len(matched_skills) / len(required_skills)
-
-        # Experience scoring
+        # ----------------------------------
+        # Experience Scoring
+        # ----------------------------------
         jd_exp_match = re.search(r'(\d+)\s+years', job_description.lower())
         resume_exp_match = re.search(r'(\d+)\s+years', resume_text)
 
@@ -120,15 +154,32 @@ def rank_resumes():
         else:
             exp_score = 0.5  # default if not mentioned
 
-        # Final score (weighted)
-        final_score = (0.6 * similarity_scores[i]) + (0.3 * skill_score) + (0.1 * exp_score)
+        # ----------------------------------
+        # Final Weighted Score
+        # ----------------------------------
+        final_score = (
+            (0.6 * similarity_scores[i]) +
+            (0.3 * skill_score) +
+            (0.1 * exp_score)
+        )
 
-        ranked.append((resume_names[i], final_score, skill_score, matched_skills, exp_score))
+        ranked.append((
+            resume_names[i],
+            round(final_score, 3),
+            round(skill_score, 3),
+            matched_skills,
+            round(exp_score, 3)
+        ))
 
     # Sort by final score
     ranked = sorted(ranked, key=lambda x: x[1], reverse=True)
 
-    return render_template("results.html", ranked=ranked)
+    return render_template(
+        "results.html",
+        ranked=ranked,
+        required_skills=required_skills
+    )
+
 
 @app.route("/clear")
 def clear_resumes():
