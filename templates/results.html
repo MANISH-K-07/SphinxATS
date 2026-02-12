@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ranking Results - SphinxATS</title>
+</head>
+<body>
+
+<h1>Resume Ranking Results</h1>
+
+<table border="1" cellpadding="10">
+    <tr>
+        <th>Rank</th>
+        <th>Resume Name</th>
+        <th>Similarity Score</th>
+    </tr>
+
+    {% for resume, score in ranked %}
+    <tr>
+        <td>{{ loop.index }}</td>
+        <td>{{ resume }}</td>
+        <td>{{ "%.4f"|format(score) }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<br>
+<a href="/">Go Back</a>
+
+</body>
+</html>

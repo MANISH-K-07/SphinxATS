@@ -1,15 +1,35 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Resume Screening System</title>
+    <title>SphinxATS</title>
 </head>
 <body>
-    <h1>Upload Your Resume</h1>
 
+    <h1>SphinxATS - Automated Resume Screening</h1>
+
+    <hr>
+
+    <h2>HR: Submit Job Description</h2>
+    <form action="/submit_jd" method="POST">
+        <textarea name="jd_text" rows="8" cols="60" placeholder="Enter Job Description here..." required></textarea>
+        <br><br>
+        <button type="submit">Submit Job Description</button>
+    </form>
+
+    <hr>
+
+    <h2>Applicant: Upload Resume (PDF)</h2>
     <form action="/upload" method="POST" enctype="multipart/form-data">
         <input type="file" name="resume" accept=".pdf" required>
         <button type="submit">Upload Resume</button>
     </form>
+
+    <hr>
+
+    <h2>HR: Rank Resumes</h2>
+    <a href="/rank">
+        <button>Generate Ranking</button>
+    </a>
 
 </body>
 </html>
