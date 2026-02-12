@@ -11,14 +11,16 @@
     <tr>
         <th>Rank</th>
         <th>Resume Name</th>
-        <th>Similarity Score</th>
+        <th>Final Score</th>
+        <th>Skill Match Score</th>
     </tr>
 
-    {% for resume, score in ranked %}
+    {% for resume, final_score, skill_score in ranked %}
     <tr>
         <td>{{ loop.index }}</td>
         <td>{{ resume }}</td>
-        <td>{{ "%.4f"|format(score) }}</td>
+        <td>{{ "%.4f"|format(final_score) }}</td>
+        <td>{{ "%.4f"|format(skill_score) }}</td>
     </tr>
     {% endfor %}
 </table>
