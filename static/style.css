@@ -1,0 +1,42 @@
+body {
+    background: linear-gradient(to right, #f8f9fa, #e9ecef);
+}
+
+.brand-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #212529;
+}
+
+.subtitle {
+    color: #6c757d;
+}
+
+.card {
+    border-radius: 15px;
+}
+
+.btn-primary {
+    background-color: #4e73df;
+    border: none;
+}
+
+.btn-success {
+    background-color: #1cc88a;
+    border: none;
+}
+
+.btn-dark {
+    background-color: #343a40;
+}
+
+.badge-skill {
+    background-color: #20c997;
+    font-size: 0.85rem;
+    margin: 2px;
+}
+
+.footer-text {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
