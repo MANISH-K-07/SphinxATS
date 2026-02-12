@@ -60,7 +60,7 @@ def rank_resumes():
     global job_description
 
     if job_description == "":
-        return "Please submit a Job Description first."
+        return render_template("message.html", message="Please submit a Job Description first.")
 
     resumes = []
     resume_names = []
@@ -80,7 +80,7 @@ def rank_resumes():
             resume_names.append(filename)
 
     if not resumes:
-        return "No resumes uploaded."
+        return render_template("message.html", message="No resumes uploaded.")
 
     # TF-IDF Similarity
     documents = [job_description.lower()] + resumes
