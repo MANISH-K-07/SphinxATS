@@ -16,10 +16,53 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background: linear-gradient(135deg, #1e1e2f, #2b2b45);
+            overflow: hidden;
+            background: linear-gradient(-45deg, #1e1e2f, #2b2b45, #1a1a2e, #16213e);
+            background-size: 400% 400%;
+            animation: gradientShift 12s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Floating glow effects */
+        .background-glow {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(139,92,246,0.35), transparent 60%);
+            top: -200px;
+            left: -200px;
+            filter: blur(100px);
+            animation: float1 15s infinite alternate ease-in-out;
+        }
+
+        .background-glow2 {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(99,102,241,0.35), transparent 60%);
+            bottom: -150px;
+            right: -150px;
+            filter: blur(100px);
+            animation: float2 18s infinite alternate ease-in-out;
+        }
+
+        @keyframes float1 {
+            from { transform: translate(0, 0); }
+            to { transform: translate(100px, 80px); }
+        }
+
+        @keyframes float2 {
+            from { transform: translate(0, 0); }
+            to { transform: translate(-80px, -100px); }
         }
 
         .card {
+            position: relative;
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(20px);
             padding: 50px;
@@ -28,14 +71,7 @@
             box-shadow: 0 8px 30px rgba(0,0,0,0.4);
             text-align: center;
             color: white;
-        }
-
-        h2 {
-            margin-bottom: 10px;
-        }
-
-        p {
-            color: #aaa;
+            z-index: 10;
         }
 
         select, button {
@@ -73,12 +109,17 @@
 
         .tagline {
             font-size: 13px;
-            color: #888;
+            color: #aaa;
             margin-bottom: 30px;
         }
     </style>
 </head>
+
 <body>
+
+    <div class="background-glow"></div>
+    <div class="background-glow2"></div>
+
     <div class="card">
         <div class="logo">SphinxATS</div>
         <div class="tagline">Resume Screening & Ranking System</div>
@@ -93,5 +134,6 @@
             <button type="submit">Continue</button>
         </form>
     </div>
+
 </body>
 </html>
