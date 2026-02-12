@@ -1,108 +1,222 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Ranking Results</title>
-    <style>
-        body { font-family: Arial; background: #f4f6f9; padding: 40px; }
-        .container { max-width: 1200px; margin: auto; background: white; padding: 30px; border-radius: 8px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { padding: 12px; border-bottom: 1px solid #ddd; text-align: left; }
-        th { background: #2c3e50; color: white; }
-        tr:hover { background: #f2f2f2; }
+    <title>Ranking Results - SphinxATS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 
-        .rank-badge {
-            font-weight: bold;
-            color: white;
-            padding: 5px 10px;
-            border-radius: 4px;
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+            box-sizing: border-box;
         }
 
-        .rank-1 { background: #27ae60; }
-        .rank-2 { background: #2980b9; }
-        .rank-3 { background: #8e44ad; }
+        body {
+            margin: 0;
+            padding: 40px;
+            background: #0f172a;
+            color: white;
+        }
 
+        .container {
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        h2 {
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background: #1e293b;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.35);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 14px;
+            text-align: left;
+        }
+
+        th {
+            background: #334155;
+            font-weight: 600;
+            font-size: 14px;
+            color: #e2e8f0;
+        }
+
+        tr {
+            border-bottom: 1px solid #334155;
+            transition: 0.2s ease;
+        }
+
+        tr:hover {
+            background: rgba(99,102,241,0.08);
+        }
+
+        /* Rank badge styling */
+        .rank-badge {
+            font-weight: bold;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            display: inline-block;
+        }
+
+        .rank-1 {
+            background: linear-gradient(90deg, #22c55e, #16a34a);
+        }
+
+        .rank-2 {
+            background: linear-gradient(90deg, #3b82f6, #2563eb);
+        }
+
+        .rank-3 {
+            background: linear-gradient(90deg, #a855f7, #7e22ce);
+        }
+
+        .rank-default {
+            background: #475569;
+        }
+
+        /* Progress Bar */
         .progress-container {
-            background: #e0e0e0;
+            background: #334155;
             border-radius: 20px;
             overflow: hidden;
-            height: 18px;
-            width: 150px;
+            height: 20px;
+            width: 160px;
         }
 
         .progress-bar {
             height: 100%;
+            font-size: 12px;
+            line-height: 20px;
             text-align: center;
             color: white;
-            font-size: 12px;
-            line-height: 18px;
+            font-weight: 600;
+            transition: width 0.5s ease;
         }
 
-        .green { background: #27ae60; }
-        .yellow { background: #f39c12; }
-        .red { background: #c0392b; }
+        .green {
+            background: linear-gradient(90deg, #22c55e, #16a34a);
+        }
+
+        .yellow {
+            background: linear-gradient(90deg, #facc15, #eab308);
+        }
+
+        .red {
+            background: linear-gradient(90deg, #ef4444, #dc2626);
+        }
 
         .back {
-            margin-top: 20px;
+            margin-top: 25px;
             display: inline-block;
             text-decoration: none;
-            background: #2c3e50;
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
             color: white;
-            padding: 8px 15px;
-            border-radius: 4px;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: 0.3s ease;
         }
+
+        .back:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(99,102,241,0.4);
+        }
+
+        .skills {
+            color: #cbd5e1;
+            font-size: 13px;
+        }
+
+        .score-highlight {
+            font-weight: 600;
+            color: #38bdf8;
+        }
+
     </style>
 </head>
+
 <body>
+
     <div class="container">
-        <h2>Resume Ranking Results</h2>
+        <h2>📊 Resume Ranking Results</h2>
 
-        <table>
-            <tr>
-                <th>Rank</th>
-                <th>Resume</th>
-                <th>Final Score</th>
-                <th>Skill Match</th>
-                <th>Experience Score</th>
-                <th>Matched Skills</th>
-            </tr>
+        <div class="card">
 
-            {% for resume in ranked %}
-            <tr>
-                <td>
-                    <span class="rank-badge rank-{{ loop.index if loop.index <= 3 else '' }}">
-                        #{{ loop.index }}
-                    </span>
-                </td>
+            <table>
+                <tr>
+                    <th>Rank</th>
+                    <th>Resume</th>
+                    <th>Final Score</th>
+                    <th>Skill Match</th>
+                    <th>Experience Score</th>
+                    <th>Matched Skills</th>
+                </tr>
 
-                <td>{{ resume.name }}</td>
+                {% for resume in ranked %}
+                <tr>
 
-                <td>{{ resume.final_score }}</td>
+                    <td>
+                        {% if loop.index == 1 %}
+                            <span class="rank-badge rank-1">#1</span>
+                        {% elif loop.index == 2 %}
+                            <span class="rank-badge rank-2">#2</span>
+                        {% elif loop.index == 3 %}
+                            <span class="rank-badge rank-3">#3</span>
+                        {% else %}
+                            <span class="rank-badge rank-default">#{{ loop.index }}</span>
+                        {% endif %}
+                    </td>
 
-                <td>
-                    <div class="progress-container">
-                        <div class="progress-bar
-                            {% if resume.skill_percent >= 75 %}
-                                green
-                            {% elif resume.skill_percent >= 50 %}
-                                yellow
-                            {% else %}
-                                red
-                            {% endif %}
-                        "
-                        style="width: {{ resume.skill_percent }}%;">
-                            {{ resume.skill_percent }}%
+                    <td>{{ resume.name }}</td>
+
+                    <td class="score-highlight">
+                        {{ resume.final_score }}
+                    </td>
+
+                    <td>
+                        <div class="progress-container">
+                            <div class="progress-bar
+                                {% if resume.skill_percent >= 75 %}
+                                    green
+                                {% elif resume.skill_percent >= 50 %}
+                                    yellow
+                                {% else %}
+                                    red
+                                {% endif %}
+                            "
+                            style="width: {{ resume.skill_percent }}%;">
+                                {{ resume.skill_percent }}%
+                            </div>
                         </div>
-                    </div>
-                </td>
+                    </td>
 
-                <td>{{ resume.exp_score }}</td>
+                    <td>{{ resume.exp_score }}</td>
 
-                <td>{{ resume.matched_skills | join(", ") }}</td>
-            </tr>
-            {% endfor %}
-        </table>
+                    <td class="skills">
+                        {{ resume.matched_skills | join(", ") }}
+                    </td>
+
+                </tr>
+                {% endfor %}
+
+            </table>
+
+        </div>
 
         <a class="back" href="/hr">Back to HR Dashboard</a>
+
     </div>
+
 </body>
 </html>

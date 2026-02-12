@@ -1,42 +1,121 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Message</title>
+    <title>SphinxATS - Message</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
     <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            background: #f4f6f9;
+            margin: 0;
+            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            overflow: hidden;
+            background: linear-gradient(-45deg, #1e1e2f, #2b2b45, #1a1a2e, #16213e);
+            background-size: 400% 400%;
+            animation: gradientShift 12s ease infinite;
+            color: white;
         }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Floating glow effects */
+        .background-glow {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(139,92,246,0.35), transparent 60%);
+            top: -200px;
+            left: -200px;
+            filter: blur(100px);
+            animation: float1 15s infinite alternate ease-in-out;
+        }
+
+        .background-glow2 {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(99,102,241,0.35), transparent 60%);
+            bottom: -150px;
+            right: -150px;
+            filter: blur(100px);
+            animation: float2 18s infinite alternate ease-in-out;
+        }
+
+        @keyframes float1 {
+            from { transform: translate(0, 0); }
+            to { transform: translate(100px, 80px); }
+        }
+
+        @keyframes float2 {
+            from { transform: translate(0, 0); }
+            to { transform: translate(-80px, -100px); }
+        }
+
         .card {
-            background: white;
-            padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            position: relative;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            padding: 50px;
+            width: 420px;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.4);
             text-align: center;
-            width: 400px;
+            z-index: 10;
         }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #e2e8f0;
+        }
+
+        h3 {
+            font-weight: 500;
+            margin-bottom: 25px;
+            color: #f1f5f9;
+        }
+
         a {
             display: inline-block;
-            margin-top: 20px;
             text-decoration: none;
-            background: #2c3e50;
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
             color: white;
-            padding: 10px 20px;
-            border-radius: 4px;
+            padding: 12px 22px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: 0.3s ease;
         }
+
         a:hover {
-            background: #1a252f;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(99,102,241,0.4);
         }
+
     </style>
 </head>
+
 <body>
+
+    <div class="background-glow"></div>
+    <div class="background-glow2"></div>
+
     <div class="card">
+        <div class="logo">SphinxATS</div>
         <h3>{{ message }}</h3>
         <a href="/">Go Back</a>
     </div>
+
 </body>
 </html>
