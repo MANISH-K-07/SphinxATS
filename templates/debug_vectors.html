@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Resume Vectors</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f6f9; padding: 40px; }
+        .container { max-width: 900px; margin: auto; background: white; padding: 30px; border-radius: 8px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 10px; border-bottom: 1px solid #ddd; text-align: left; }
+        th { background: #2c3e50; color: white; }
+        tr:hover { background: #f2f2f2; }
+        .back { margin-top: 20px; display: inline-block; text-decoration: none; background: #2c3e50; color: white; padding: 8px 15px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Resume Vectors</h2>
+        <table>
+            <tr>
+                <th>Resume</th>
+                <th>Vector (Skills + Experience)</th>
+            </tr>
+            {% for item in vectors %}
+            <tr>
+                <td>{{ item.resume }}</td>
+                <td>{{ item.vector }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <a class="back" href="/hr">Back to HR Dashboard</a>
+    </div>
+</body>
+</html>

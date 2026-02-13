@@ -60,7 +60,6 @@
             background: rgba(99,102,241,0.08);
         }
 
-        /* Rank badge styling */
         .rank-badge {
             font-weight: bold;
             padding: 6px 12px;
@@ -69,23 +68,19 @@
             display: inline-block;
         }
 
-        .rank-1 {
-            background: linear-gradient(90deg, #22c55e, #16a34a);
+        .rank-1 { background: linear-gradient(90deg, #22c55e, #16a34a); }
+        .rank-2 { background: linear-gradient(90deg, #3b82f6, #2563eb); }
+        .rank-3 { background: linear-gradient(90deg, #a855f7, #7e22ce); }
+        .rank-default { background: #475569; }
+
+        .cluster-badge {
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            background: linear-gradient(90deg, #f59e0b, #d97706);
         }
 
-        .rank-2 {
-            background: linear-gradient(90deg, #3b82f6, #2563eb);
-        }
-
-        .rank-3 {
-            background: linear-gradient(90deg, #a855f7, #7e22ce);
-        }
-
-        .rank-default {
-            background: #475569;
-        }
-
-        /* Progress Bar */
         .progress-container {
             background: #334155;
             border-radius: 20px;
@@ -104,17 +99,9 @@
             transition: width 0.5s ease;
         }
 
-        .green {
-            background: linear-gradient(90deg, #22c55e, #16a34a);
-        }
-
-        .yellow {
-            background: linear-gradient(90deg, #facc15, #eab308);
-        }
-
-        .red {
-            background: linear-gradient(90deg, #ef4444, #dc2626);
-        }
+        .green { background: linear-gradient(90deg, #22c55e, #16a34a); }
+        .yellow { background: linear-gradient(90deg, #facc15, #eab308); }
+        .red { background: linear-gradient(90deg, #ef4444, #dc2626); }
 
         .back {
             margin-top: 25px;
@@ -142,81 +129,112 @@
             font-weight: 600;
             color: #38bdf8;
         }
-
     </style>
 </head>
 
 <body>
 
-    <div class="container">
-        <h2>📊 Resume Ranking Results</h2>
+<div class="container">
+    <h2>📊 Resume Ranking Results</h2>
 
-        <div class="card">
+    <div class="card">
 
-            <table>
-                <tr>
-                    <th>Rank</th>
-                    <th>Resume</th>
-                    <th>Final Score</th>
-                    <th>Skill Match</th>
-                    <th>Experience Score</th>
-                    <th>Matched Skills</th>
-                </tr>
+        <h3 style="margin-bottom: 20px;">Cluster Intelligence Summary</h3>
 
-                {% for resume in ranked %}
-                <tr>
+        <div style="display: flex; gap: 20px; margin-bottom: 30px; flex-wrap: wrap;">
 
-                    <td>
-                        {% if loop.index == 1 %}
-                            <span class="rank-badge rank-1">#1</span>
-                        {% elif loop.index == 2 %}
-                            <span class="rank-badge rank-2">#2</span>
-                        {% elif loop.index == 3 %}
-                            <span class="rank-badge rank-3">#3</span>
-                        {% else %}
-                            <span class="rank-badge rank-default">#{{ loop.index }}</span>
-                        {% endif %}
-                    </td>
+            {% for cluster, data in cluster_summary.items() %}
+            <div style="
+                background: #334155;
+                padding: 20px;
+                border-radius: 12px;
+                min-width: 250px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            ">
+                <h4 style="margin-top: 0;">Cluster {{ cluster }}</h4>
 
-                    <td>{{ resume.name }}</td>
+                <p style="margin: 6px 0;">
+                    👥 {{ data.resume_count }} Candidates
+                </p>
 
-                    <td class="score-highlight">
-                        {{ resume.final_score }}
-                    </td>
-
-                    <td>
-                        <div class="progress-container">
-                            <div class="progress-bar
-                                {% if resume.skill_percent >= 75 %}
-                                    green
-                                {% elif resume.skill_percent >= 50 %}
-                                    yellow
-                                {% else %}
-                                    red
-                                {% endif %}
-                            "
-                            style="width: {{ resume.skill_percent }}%;">
-                                {{ resume.skill_percent }}%
-                            </div>
-                        </div>
-                    </td>
-
-                    <td>{{ resume.exp_score }}</td>
-
-                    <td class="skills">
-                        {{ resume.matched_skills | join(", ") }}
-                    </td>
-
-                </tr>
-                {% endfor %}
-
-            </table>
+                <p style="margin: 6px 0;">
+                    🧠 Focus Skills:
+                    <strong>
+                        {{ data.top_skills | join(", ") if data.top_skills else "General Profiles" }}
+                    </strong>
+                </p>
+            </div>
+            {% endfor %}
 
         </div>
 
-        <a class="back" href="/hr">Back to HR Dashboard</a>
+        <table>
+            <tr>
+                <th>Rank</th>
+                <th>Resume</th>
+                <th>Final Score</th>
+                <th>Skill Match</th>
+                <th>Experience</th>
+                <th>Cluster</th>
+                <th>Matched Skills</th>
+            </tr>
+
+            {% for resume in ranked %}
+            <tr>
+
+                <td>
+                    {% if loop.index == 1 %}
+                        <span class="rank-badge rank-1">#1</span>
+                    {% elif loop.index == 2 %}
+                        <span class="rank-badge rank-2">#2</span>
+                    {% elif loop.index == 3 %}
+                        <span class="rank-badge rank-3">#3</span>
+                    {% else %}
+                        <span class="rank-badge rank-default">#{{ loop.index }}</span>
+                    {% endif %}
+                </td>
+
+                <td>{{ resume.name }}</td>
+
+                <td class="score-highlight">
+                    {{ resume.final_score }}
+                </td>
+
+                <td>
+                    <div class="progress-container">
+                        <div class="progress-bar
+                            {% if resume.skill_percent >= 75 %}
+                                green
+                            {% elif resume.skill_percent >= 50 %}
+                                yellow
+                            {% else %}
+                                red
+                            {% endif %}
+                        "
+                        style="width: {{ resume.skill_percent }}%;">
+                            {{ resume.skill_percent }}%
+                        </div>
+                    </div>
+                </td>
+
+                <td>{{ resume.exp_score }}</td>
+
+                <td>Cluster {{ resume.cluster }}</td>
+
+                <td class="skills">
+                    {{ resume.matched_skills | join(", ") }}
+                </td>
+
+            </tr>
+            {% endfor %}
+
+        </table>
 
     </div>
+
+    <a class="back" href="/hr">Back to HR Dashboard</a>
+
+</div>
 
 </body>
 </html>
