@@ -176,6 +176,22 @@ Open in Browser:
 http://127.0.0.1:5000/
 ```
 
+### Standalone Desktop Executable
+
+The Flask-based ATS system is packaged into a standalone desktop executable using PyInstaller to enable one-click deployment without requiring Python environment setup on the host system.
+
+Double click:
+
+```
+SphinxATS.exe
+```
+
+📦 Want to Distribute?
+
+```
+dist/SphinxATS.exe
+```
+
 ---
 
 ## ⚠️ Limitations

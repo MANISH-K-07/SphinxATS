@@ -1,3 +1,5 @@
+import webbrowser
+import threading
 import re
 import os
 import pdfplumber
@@ -442,5 +444,9 @@ def clear_resumes():
     return render_template("message.html", message="All resumes cleared successfully!")
     
 
+def open_browser():
+    webbrowser.open_new("http://127.0.0.1:5000")
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    threading.Timer(1.5, open_browser).start()
+    app.run()
