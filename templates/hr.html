@@ -91,9 +91,53 @@
         a:hover {
             color: white;
         }
+
+        /* ---------------- LOADER ---------------- */
+
+        #loader-overlay {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background: rgba(15,23,42,0.95);
+            top: 0;
+            left: 0;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .loader-box {
+            text-align: center;
+            color: white;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 6px solid #334155;
+            border-top: 6px solid #6366f1;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loader-box p {
+            margin-top: 15px;
+            font-size: 15px;
+            color: #cbd5e1;
+        }
+
     </style>
 </head>
+
 <body>
+
     <div class="container">
         <h2>🧑‍💼 HR Dashboard</h2>
 
@@ -108,17 +152,37 @@
         <div class="card">
             <h3>Actions</h3>
             <div class="actions">
-                <form action="/rank" method="GET">
-                    <button class="rank" type="submit">Generate Ranking</button>
+
+                <!-- LOADER TRIGGER ADDED HERE -->
+                <form action="/rank" method="GET" onsubmit="showLoader()">
+                    <button class="rank" type="submit">
+                        Generate Ranking
+                    </button>
                 </form>
 
                 <form action="/clear" method="GET">
                     <button class="clear" type="submit">Clear All Resumes</button>
                 </form>
+
             </div>
         </div>
 
         <a href="/logout">Logout</a>
     </div>
+
+    <!-- AI PROCESSING LOADER -->
+    <div id="loader-overlay">
+        <div class="loader-box">
+            <div class="spinner"></div>
+            <p>SphinxATS Intelligence Engine Processing....</p>
+        </div>
+    </div>
+
+    <script>
+        function showLoader() {
+            document.getElementById("loader-overlay").style.display = "flex";
+        }
+    </script>
+
 </body>
 </html>
