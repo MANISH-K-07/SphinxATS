@@ -381,11 +381,18 @@ def rank_resumes():
     # Cluster Summary Creation
     # -------------------------
 
+    cluster_title_map = {
+        1: "High Potential Candidates",
+        0: "Moderately Matching Profiles",
+        -1: "Low Relevance / General Profiles"
+    }
+
     cluster_summary = {}
 
     for resume in ranked:
         cluster = resume["cluster"]
         cluster_summary.setdefault(cluster, {
+            "title": cluster_title_map.get(cluster, "Software Engineering Profiles"),
             "resumes": [],
             "skills": []
         })
