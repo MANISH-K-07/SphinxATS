@@ -22,6 +22,7 @@ job_description = ""
 # ----------------------------------
 # Master Technical Skills Dataset
 # ----------------------------------
+
 TECH_SKILLS = [
     "python", "java", "c++", "c programming", "sql",
     "machine learning", "deep learning",
@@ -36,6 +37,40 @@ TECH_SKILLS = [
     "git", "linux", "pandas", "numpy",
     "opencv", "nlp", "power bi", "tableau"
 ]
+
+MIN_SKILL_THRESHOLD = 0.2
+
+# ----------------------------------
+# SPECIALIZATION GROUPS
+# ----------------------------------
+
+SPECIALIZATION_SKILLS = {
+
+    "Data Science": [
+        "python", "machine learning", "deep learning",
+        "data science", "data analysis",
+        "tensorflow", "pytorch", "keras",
+        "pandas", "numpy", "nlp"
+    ],
+
+    "Backend": [
+        "java", "python", "node", "nodejs",
+        "flask", "django", "sql",
+        "mongodb", "mysql", "postgresql"
+    ],
+
+    "Frontend": [
+        "react", "angular",
+        "html", "css", "javascript",
+        "bootstrap"
+    ],
+
+    "Cloud/DevOps": [
+        "aws", "azure", "gcp",
+        "docker", "kubernetes",
+        "linux", "git"
+    ]
+}
 
 # ----------------------------------
 # Role Protection Decorator
@@ -68,20 +103,23 @@ def extract_skills_from_jd(jd_text):
 # ----------------------------------
 def get_resume_vector(text):
     """
-    Create binary skill vector for clustering.
-    Experience is NOT included.
+    Create specialization dominance vector.
+    Example:
+    [DS_score, Backend_score, Frontend_score, Cloud_score]
     """
-
-    required_skills = extract_skills_from_jd(job_description)
 
     vector = []
 
-    for skill in required_skills:
-        pattern = r'\b' + re.escape(skill) + r'\b'
-        if re.search(pattern, text):
-            vector.append(1)
-        else:
-            vector.append(0)
+    for specialization, skills in SPECIALIZATION_SKILLS.items():
+
+        count = 0
+
+        for skill in skills:
+            pattern = r'\b' + re.escape(skill) + r'\b'
+            if re.search(pattern, text):
+                count += 1
+
+        vector.append(count)
 
     return vector
 
@@ -109,7 +147,7 @@ def debug_vectors():
                 for page in pdf.pages:
                     text += page.extract_text() or ""
 
-            vector = get_resume_vector(text, jd_exp)
+            vector = get_resume_vector(text)
             output.append({
                 "resume": filename,
                 "vector": vector
@@ -207,9 +245,26 @@ def rank_resumes():
             resumes.append(text)
             resume_names.append(filename)
 
-            # Generate ML vector
-            vector = get_resume_vector(text)
-            vectors.append(vector)
+            required_skills = extract_skills_from_jd(job_description)
+
+            matched_skills = []
+
+            for skill in required_skills:
+                pattern = r'\b' + re.escape(skill) + r'\b'
+                if re.search(pattern, text):
+                    matched_skills.append(skill)
+
+            skill_score = (
+                len(matched_skills) / len(required_skills)
+                if required_skills else 0
+            )
+
+            # FILTER: Reject low skill match resumes
+            if skill_score >= MIN_SKILL_THRESHOLD:
+                vector = get_resume_vector(text)
+                vectors.append(vector)
+            else:
+                vectors.append([-1])  # mark as rejected
 
     if not resumes:
         return render_template("message.html", message="No resumes uploaded.")
@@ -217,11 +272,22 @@ def rank_resumes():
     # -------------------------
     # KMeans Clustering
     # -------------------------
-    if len(vectors) >= 2:
+    valid_vectors = []
+    valid_index = []
+
+    for i, v in enumerate(vectors):
+        if v != [-1]:
+            valid_vectors.append(v)
+            valid_index.append(i)
+
+    cluster_labels = [-1] * len(vectors)
+
+    if len(valid_vectors) >= 2:
         kmeans = KMeans(n_clusters=2, random_state=42, n_init=10)
-        cluster_labels = kmeans.fit_predict(np.array(vectors))
-    else:
-        cluster_labels = [0] * len(vectors)
+        labels = kmeans.fit_predict(np.array(valid_vectors))
+
+        for idx, label in zip(valid_index, labels):
+            cluster_labels[idx] = int(label)
 
     # -------------------------
     # TF-IDF Similarity
@@ -265,17 +331,51 @@ def rank_resumes():
             (0.1 * exp_score)
         )
 
+        cluster_value = (
+            int(cluster_labels[i])
+            if cluster_labels[i] != -1
+            else -1
+        )
+
         ranked.append({
             "name": resume_names[i],
+            "index": i,
             "final_score": round(final_score, 3),
             "skill_score": round(skill_score, 3),
             "exp_score": round(exp_score, 3),
             "skill_percent": int(skill_score * 100),
             "matched_skills": matched_skills,
-            "cluster": int(cluster_labels[i])
+            "cluster": cluster_value
         })
 
     ranked = sorted(ranked, key=lambda x: x["final_score"], reverse=True)
+
+    # -------------------------
+    # Detect Dominant Specialization per Resume
+    # -------------------------
+
+    for resume in ranked:
+
+        original_index = resume["index"]
+        vector = vectors[original_index]
+
+        if vector == [-1]:
+            resume["specialization"] = "Rejected"
+            continue
+
+        spec_scores = {}
+
+        j = 0
+        for spec in SPECIALIZATION_SKILLS.keys():
+            spec_scores[spec] = vector[j]
+            j += 1
+
+        dominant_spec = max(spec_scores, key=spec_scores.get)
+
+        if spec_scores[dominant_spec] == 0:
+            resume["specialization"] = "General"
+        else:
+            resume["specialization"] = dominant_spec
 
     # -------------------------
     # Cluster Summary Creation
@@ -308,6 +408,20 @@ def rank_resumes():
 
         data["top_skills"] = top_skills
         data["resume_count"] = len(data["resumes"])
+
+    for resume in ranked:
+
+        if resume["cluster"] == -1:
+            resume["cluster_label"] = "Low Relevance"
+
+        elif resume["cluster"] == 0:
+            resume["cluster_label"] = "Moderate Fit"
+
+        elif resume["cluster"] == 1:
+            resume["cluster_label"] = "High Potential"
+
+    for r in ranked:
+        del r["index"]
 
     return render_template("results.html", ranked=ranked, cluster_summary=cluster_summary)
 

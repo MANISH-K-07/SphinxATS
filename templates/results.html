@@ -174,8 +174,8 @@
                 <th>Resume</th>
                 <th>Final Score</th>
                 <th>Skill Match</th>
-                <th>Experience</th>
-                <th>Cluster</th>
+                <th>Exp Score</th>
+                <th>AI Hiring Signal</th>
                 <th>Matched Skills</th>
             </tr>
 
@@ -219,7 +219,15 @@
 
                 <td>{{ resume.exp_score }}</td>
 
-                <td>Cluster {{ resume.cluster }}</td>
+                <td>
+                    {% if resume.cluster_label == "High Potential" %}
+                        ⭐ High Potential
+                    {% elif resume.cluster_label == "Moderate Fit" %}
+                        ⚠️ Moderate Fit
+                    {% else %}
+                        ❌ Low Relevance
+                    {% endif %}
+                </td>
 
                 <td class="skills">
                     {{ resume.matched_skills | join(", ") }}
