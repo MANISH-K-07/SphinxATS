@@ -1,7 +1,8 @@
-# 🐍 SphinxATS  
-### Automated Resume Screening & Ranking System
+# 🐍 SphinxATS
 
-SphinxATS is a Flask-based web application that automates resume screening and ranking based on job descriptions using Natural Language Processing techniques.
+### Automated Resume Screening & Ranking System (Flask + NLP)
+
+SphinxATS is a Flask-based web application that automates resume screening and ranking based on job descriptions using Natural Language Processing techniques. This system demonstrates how Machine Learning can assist HR professionals in filtering and ranking candidates efficiently.
 
 ---
 
@@ -9,57 +10,103 @@ SphinxATS is a Flask-based web application that automates resume screening and r
 
 SphinxATS allows:
 
-- HR to submit a Job Description
-- Applicants to upload resumes (PDF)
-- Automatic ranking of resumes based on:
-  - TF-IDF similarity
-  - Skill matching
-  - Experience matching
+* HR to submit a Job Description
+* Applicants to upload resumes (PDF)
+* Automatic ranking of resumes based on:
 
-The system generates a ranked list with score breakdown and matched skills.
+  * TF-IDF Similarity
+  * Skill Matching
+  * Experience Matching
+
+The system generates a ranked list of applicants along with:
+
+* Final Score
+* Similarity Score
+* Skill Match Score
+* Experience Score
+* Matched Skills
 
 ---
 
 ## 🧠 Features
 
-- 📄 PDF Resume Upload
-- 📝 Job Description Submission
-- 🔍 TF-IDF + Cosine Similarity Scoring
-- 🧩 Skill-Based Matching (Predefined Skill Set)
-- 🕒 Experience-Based Scoring (Regex Detection)
-- 📊 Weighted Final Score Calculation
-- 📋 Ranked Results Table
-- 🧹 Clear Uploaded Resumes
-- 🎨 Bootstrap UI with Custom Styling
+* 📄 PDF Resume Upload
+* 📝 Job Description Submission
+* 🔍 TF-IDF + Cosine Similarity Scoring
+* 🧩 Skill-Based Matching (Predefined Technical Skills)
+* 🕒 Experience Detection using Regex
+* 📊 Weighted Final Score Calculation
+* 📋 Ranked Resume Results Table
+* 🧹 Clear Uploaded Resumes Option
+* 🧑‍💼 HR Dashboard Interface
+* ⚙️ Real-time Resume Ranking
+
+---
+
+## ⚙️ Resume Ranking Methodology
+
+Each uploaded resume is evaluated using three major parameters:
+
+### 1️⃣ Similarity Score
+
+Measures how closely a resume matches the Job Description using:
+
+* TF-IDF Vectorization
+* Cosine Similarity
+
+### 2️⃣ Skill Match Score
+
+Matches resume content with predefined technical skills such as:
+
+* Python
+* Java
+* SQL
+* Machine Learning
+* Data Science
+* HTML / CSS / JavaScript
+* Flask / Django
+* C / C++
+* Git
+* NLP
+
+### 3️⃣ Experience Score
+
+Detects candidate experience using Regex patterns like:
+
+* "2 years experience"
+* "3+ years"
+* "Worked for 4 yrs"
+
+Experience score is normalized before contributing to the final score.
+
+---
+
+## 🧮 Final Score Calculation
+
+Final Ranking Score is calculated as:
+
+```
+Final Score =
+0.6 × Similarity Score +
+0.3 × Skill Match Score +
+0.1 × Experience Score
+```
+
+Resumes are ranked in descending order based on this score.
 
 ---
 
 ## 🛠️ Technologies Used
 
-- Python 3
-- Flask
-- scikit-learn
-- pdfplumber
-- HTML
-- Bootstrap 5
-- Custom CSS
-
----
-
-## ⚙️ How It Works
-
-1. Extract text from uploaded PDF resumes.
-2. Convert Job Description and resumes into TF-IDF vectors.
-3. Compute cosine similarity.
-4. Match predefined technical skills.
-5. Detect years of experience using regex.
-6. Compute final weighted score.
-7. Display ranked results with matched skills.
-
-Final Score =
-```
-0.6 × Similarity Score  + 0.3 × Skill Match Score  + 0.1 × Experience Score  
-```
+| Technology   | Purpose                    |
+| ------------ | -------------------------- |
+| Python 3     | Backend Logic              |
+| Flask        | Web Framework              |
+| scikit-learn | TF-IDF & Cosine Similarity |
+| pdfplumber   | PDF Text Extraction        |
+| HTML / CSS   | Frontend UI                |
+| Bootstrap 5  | UI Styling                 |
+| Regex        | Experience Detection       |
 
 ---
 
@@ -73,22 +120,23 @@ SphinxATS/
 ├── README.md
 ├── uploads/
 ├── static/
-│ └── style.css
+│   └── style.css
 ├── templates/
-│ ├── index.html
-│ ├── results.html
-│ └── message.html
+│   ├── login.html
+│   ├── hr.html
+│   ├── applicant.html
+│   ├── results.html
+│   ├── message.html
+│   ├── debug_vectors.html
+│   └── 403.html
 └── venv/
 ```
-
 
 ---
 
 ## 🚀 Installation & Setup
 
-### 1️⃣ Clone or Copy Project Folder
-
-Move into project directory:
+### 1️⃣ Move into Project Directory
 
 ```
 cd SphinxATS
@@ -110,7 +158,7 @@ Mac/Linux:
 source venv/bin/activate
 ```
 
-### 3️⃣ Install Required Packages
+### 3️⃣ Install Dependencies
 
 ```
 pip install -r requirements.txt
@@ -122,7 +170,7 @@ pip install -r requirements.txt
 python app.py
 ```
 
-Open browser:
+Open in Browser:
 
 ```
 http://127.0.0.1:5000/
@@ -132,30 +180,31 @@ http://127.0.0.1:5000/
 
 ## ⚠️ Limitations
 
-- Uses predefined skill list (not dynamic NLP extraction)
-- Experience detection based on simple regex
-- No database persistence
-- No authentication system
+* Uses predefined skill list
+* Experience detection based on Regex
+* No database integration
+* No authentication system
+* Runs on local server only
 
 ---
 
 ## 🔮 Future Improvements
 
-- NLP-based automatic skill extraction
-- User authentication (HR & Applicant roles)
-- Database integration
-- Resume feedback suggestions
-- Deployment on cloud platform
+* NLP-based automatic skill extraction
+* Resume feedback suggestions
+* Database integration (MySQL / MongoDB)
+* HR & Applicant Login System
+* Cloud Deployment (AWS / Render)
 
 ---
 
 ## 🎓 Academic Purpose
 
-This was developed as a B.Tech capstone project to demonstrate:
+This project was developed as a **B.Tech Final Year Capstone Project** to demonstrate:
 
-- Web development using Flask
-- Machine Learning (TF-IDF & Cosine Similarity)
-- Text processing & NLP basics
-- Resume ranking automation logic
+* Web Development using Flask
+* Machine Learning Concepts (TF-IDF & Cosine Similarity)
+* Natural Language Processing Basics
+* Resume Ranking Automation Logic
 
 ---
