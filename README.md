@@ -4,6 +4,9 @@
 
 SphinxATS is a Flask-based web application that automates resume screening and ranking based on job descriptions using Natural Language Processing techniques. This system demonstrates how Machine Learning can assist HR professionals in filtering and ranking candidates efficiently.
 
+📄 **Published:** [*"SphinxATS: A Multi-Attribute AI-based Decision Support System for Automated Resume Screening and Candidate Ranking"* (IEEE ICSSAS 2026)](https://ieeexplore.ieee.org/document/11559449)
+
+
 ---
 
 ## 📌 Project Overview
